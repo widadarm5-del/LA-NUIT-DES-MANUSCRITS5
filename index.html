@@ -1,0 +1,989 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔍 LA NUIT DES MANUSCRITS - NIVEAU EXPERT</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: #0a0a2a;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            font-family: 'Press Start 2P', cursive;
+        }
+        
+        #game-container {
+            width: 100%;
+            max-width: 1400px;
+            height: 900px;
+            background: #1a2a3a;
+            border: 8px solid #ffd700;
+            border-radius: 0;
+            box-shadow: 0 0 0 4px #4a7a9c;
+            padding: 20px;
+            position: relative;
+            overflow-y: auto;
+        }
+        
+        /* EN-TÊTE */
+        .pixel-header {
+            background: #ffd700;
+            border: 4px solid #4a7a9c;
+            padding: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .pixel-title {
+            color: #1a2a3a;
+            font-size: 1.4em;
+        }
+        
+        .pixel-badge {
+            background: #4a7a9c;
+            color: #ffd700;
+            padding: 12px 20px;
+            border: 4px solid #ffd700;
+            font-size: 1em;
+        }
+        
+        /* BARRE DE PROGRESSION */
+        .pixel-progress {
+            background: #1a1a2a;
+            border: 4px solid #ffd700;
+            height: 40px;
+            margin: 20px 0;
+            position: relative;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: #4a7a9c;
+            width: 0%;
+            transition: width 0.3s;
+        }
+        
+        .progress-steps {
+            position: absolute;
+            top: -30px;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: space-between;
+            color: #ffd700;
+            font-size: 0.6em;
+        }
+        
+        /* INVENTAIRE */
+        .pixel-inventory {
+            background: #1a2a3a;
+            border: 4px solid #ffd700;
+            padding: 20px;
+            margin: 20px 0;
+            display: flex;
+            justify-content: space-around;
+        }
+        
+        .inventory-slot {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #ffd700;
+            font-size: 0.6em;
+            gap: 10px;
+        }
+        
+        .slot-icon {
+            width: 60px;
+            height: 60px;
+            background: #2a3a4a;
+            border: 4px solid #4a7a9c;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2em;
+        }
+        
+        .slot-icon.completed {
+            background: #4a7a9c;
+            border-color: #ffd700;
+        }
+        
+        /* DÉTECTIVE */
+        .detective-area {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        
+        .detective-pixel {
+            width: 96px;
+            height: 96px;
+            background: #ffd700;
+            border: 4px solid #4a7a9c;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3em;
+        }
+        
+        /* SCÈNE */
+        .pixel-scene {
+            background: #1a2a3a;
+            border: 6px solid #ffd700;
+            padding: 25px;
+            margin: 20px 0;
+        }
+        
+        /* EN-TÊTE DE LIEU */
+        .location-header {
+            background: #4a7a9c;
+            color: #ffd700;
+            padding: 15px;
+            font-size: 1em;
+            text-align: center;
+            border-bottom: 4px solid #ffd700;
+            margin-bottom: 20px;
+        }
+        
+        /* PERSONNAGE */
+        .character-container {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        
+        .pixel-character {
+            width: 120px;
+            height: 120px;
+            border: 4px solid #ffd700;
+            background: #2a3a4a;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .character-antigone {
+            background: #8b5a2b;
+        }
+        .character-condamne {
+            background: #2a2a2a;
+        }
+        .character-enfant {
+            background: #e6be8a;
+        }
+        
+        .character-emoji {
+            font-size: 3em;
+        }
+        
+        .character-name {
+            font-size: 0.5em;
+            color: #ffd700;
+            margin-top: 10px;
+        }
+        
+        /* EXTRAIT */
+        .extrait-card {
+            background: #2a3a4a;
+            border: 4px solid #4a7a9c;
+            padding: 20px;
+            margin: 20px 0;
+            color: #ffd700;
+            font-size: 0.7em;
+            line-height: 1.8;
+        }
+        
+        .extrait-texte {
+            margin-bottom: 10px;
+            font-style: italic;
+            border-left: 4px solid #ffd700;
+            padding-left: 20px;
+        }
+        
+        .extrait-reference {
+            color: #4a7a9c;
+            font-size: 0.6em;
+            text-align: right;
+        }
+        
+        /* GRILLE DE QUESTIONS */
+        .questions-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .question-card {
+            background: #1a2a3a;
+            border: 4px solid #4a7a9c;
+            padding: 15px;
+            cursor: pointer;
+            color: #ffd700;
+            font-size: 0.5em;
+            line-height: 1.6;
+            min-height: 100px;
+        }
+        
+        .question-card:hover {
+            border-color: #ffd700;
+        }
+        
+        .question-card.completed {
+            background: #4a7a9c;
+        }
+        
+        .question-number {
+            background: #ffd700;
+            color: #1a2a3a;
+            padding: 5px;
+            width: 30px;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        
+        .question-status {
+            text-align: right;
+            margin-top: 10px;
+        }
+        
+        /* MODALE */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .modal-content {
+            background: #1a2a3a;
+            border: 8px solid #ffd700;
+            padding: 30px;
+            max-width: 800px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .modal-question {
+            color: #ffd700;
+            font-size: 0.7em;
+            line-height: 1.8;
+            margin-bottom: 30px;
+        }
+        
+        .modal-choices {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .modal-choice {
+            background: #2a3a4a;
+            border: 4px solid #4a7a9c;
+            color: #ffd700;
+            padding: 20px;
+            cursor: pointer;
+            font-size: 0.6em;
+        }
+        
+        .modal-choice:hover {
+            border-color: #ffd700;
+        }
+        
+        .modal-choice.correct {
+            background: #2a5a2a;
+            border-color: #8bc34a;
+        }
+        
+        .modal-choice.incorrect {
+            background: #5a2a2a;
+            border-color: #c34a4a;
+        }
+        
+        .modal-close {
+            background: #4a7a9c;
+            border: 4px solid #ffd700;
+            color: #ffd700;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        
+        /* FEEDBACK */
+        .feedback-good {
+            background: #2a5a2a;
+            border: 4px solid #8bc34a;
+            color: #fff;
+            padding: 20px;
+            margin: 20px 0;
+            font-size: 0.7em;
+        }
+        
+        .feedback-bad {
+            background: #5a2a2a;
+            border: 4px solid #c34a4a;
+            color: #fff;
+            padding: 20px;
+            margin: 20px 0;
+            font-size: 0.7em;
+        }
+        
+        /* BOUTONS */
+        .pixel-btn {
+            background: #4a7a9c;
+            border: 4px solid #ffd700;
+            color: #ffd700;
+            padding: 20px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.8em;
+            cursor: pointer;
+            width: 100%;
+            margin: 15px 0;
+        }
+        
+        .pixel-btn:hover {
+            background: #2a4a6a;
+        }
+        
+        /* GRILLE DE LA CARTE */
+        .map-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .map-tile {
+            background: #1a2a3a;
+            border: 6px solid #4a7a9c;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            color: #ffd700;
+            font-size: 0.7em;
+            min-height: 200px;
+        }
+        
+        .map-tile:hover {
+            border-color: #ffd700;
+        }
+        
+        .map-tile.completed {
+            background: #4a7a9c;
+        }
+        
+        .map-tile.locked {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .tile-icon {
+            font-size: 3em;
+            margin-bottom: 10px;
+        }
+        
+        .tile-progress {
+            font-size: 0.7em;
+            color: #4a7a9c;
+            margin-top: 10px;
+        }
+        
+        /* DIPLÔME */
+        .pixel-diploma {
+            background: #ffd700;
+            border: 8px double #4a7a9c;
+            padding: 40px;
+            text-align: center;
+            color: #1a2a3a;
+        }
+        
+        .diploma-stats {
+            background: rgba(255,255,255,0.3);
+            padding: 30px;
+            margin: 30px 0;
+            text-align: left;
+            font-size: 0.7em;
+            line-height: 2;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <!-- HEADER -->
+        <div class="pixel-header">
+            <span class="pixel-title">🔍 LA NUIT DES MANUSCRITS - NIVEAU EXPERT</span>
+            <span class="pixel-badge">DOSSIER N°2024</span>
+        </div>
+        
+        <!-- PROGRESSION -->
+        <div class="pixel-progress">
+            <div class="progress-fill" id="progress-fill"></div>
+            <div class="progress-steps">
+                <span id="antigone-progress">🏛️ ANTIGONE (0/6)</span>
+                <span id="dernier-progress">⛓️ DERNIER JOUR (0/6)</span>
+                <span id="boite-progress">🕌 BOÎTE (0/6)</span>
+                <span>🏆 FINAL</span>
+            </div>
+        </div>
+        
+        <!-- INVENTAIRE -->
+        <div class="pixel-inventory">
+            <div class="inventory-slot">
+                <div class="slot-icon" id="antigone-icon">🏛️</div>
+                <span>ANTIGONE</span>
+                <span id="antigone-count">0/6</span>
+            </div>
+            <div class="inventory-slot">
+                <div class="slot-icon" id="dernier-icon">⛓️</div>
+                <span>DERNIER JOUR</span>
+                <span id="dernier-count">0/6</span>
+            </div>
+            <div class="inventory-slot">
+                <div class="slot-icon" id="boite-icon">🕌</div>
+                <span>BOÎTE</span>
+                <span id="boite-count">0/6</span>
+            </div>
+        </div>
+        
+        <!-- DÉTECTIVE -->
+        <div class="detective-area">
+            <div class="detective-pixel">🕵️</div>
+        </div>
+        
+        <!-- CONTENEUR PRINCIPAL -->
+        <div id="scene-container"></div>
+        
+        <!-- BOUTON RÉINITIALISATION -->
+        <button class="pixel-btn" onclick="resetGame()">🔍 NOUVELLE ENQUÊTE</button>
+    </div>
+
+    <!-- MODALE (cachée par défaut) -->
+    <div id="question-modal" class="modal-overlay hidden">
+        <div class="modal-content" id="modal-content"></div>
+    </div>
+
+    <script>
+        // ÉTAT DU JEU
+        let gameState = {
+            currentScene: 'accueil',
+            currentQuestion: null,
+            modalOpen: false,
+            
+            antigone: [false, false, false, false, false, false],
+            dernierjour: [false, false, false, false, false, false],
+            boite: [false, false, false, false, false, false]
+        };
+        
+        // QUESTIONS ANTIGONE
+        const antigoneQuestions = [
+            {
+                text: "Quelle est la particularité narrative d'Antigone ?",
+                extrait: "ANTIGONE : Je dirai oui. Je dirai oui à la mort, plutôt que de dire non à ce que je dois faire.",
+                choices: [
+                    { text: "C'est un roman avec un narrateur omniscient", correct: false, explanation: "Non, Antigone est une pièce de théâtre, pas un roman." },
+                    { text: "Il n'y a pas de narrateur, c'est du théâtre", correct: true, explanation: "Exact ! Au théâtre, les personnages parlent directement." },
+                    { text: "Le narrateur est Antigone elle-même", correct: false, explanation: "Non, même si elle parle, elle n'est pas un 'narrateur'." },
+                    { text: "C'est Jean Anouilh qui raconte", correct: false, explanation: "L'auteur n'est pas un narrateur dans l'œuvre." }
+                ]
+            },
+            {
+                text: "Que représente le tombeau dans la pièce ?",
+                extrait: "ANTIGONE : Dans mon tombeau, vivante, enfermée. Mais je serai libre.",
+                choices: [
+                    { text: "Un lieu réel, une prison souterraine", correct: false, explanation: "C'est plus qu'un simple lieu physique." },
+                    { text: "Un symbole de la mort et de la liberté", correct: true, explanation: "Exact ! Le tombeau représente à la fois la mort et la liberté." },
+                    { text: "Un simple décor de théâtre", correct: false, explanation: "Non, il a une valeur symbolique forte." },
+                    { text: "Une métaphore du pouvoir de Créon", correct: false, explanation: "Pas directement." }
+                ]
+            },
+            {
+                text: "Quel est le rôle du Prologue dans Antigone ?",
+                extrait: "LE PROLOGUE : Voilà. Ces personnages vont vous jouer l'histoire d'Antigone.",
+                choices: [
+                    { text: "C'est un narrateur qui présente les personnages", correct: true, explanation: "Exact ! Le Prologue présente les personnages comme un narrateur." },
+                    { text: "C'est un personnage comme les autres", correct: false, explanation: "Non, il a un statut particulier." },
+                    { text: "C'est l'auteur qui intervient", correct: false, explanation: "Non, c'est un personnage créé par l'auteur." },
+                    { text: "C'est le choeur antique", correct: false, explanation: "Anouilh a transformé le choeur en Prologue." }
+                ]
+            },
+            {
+                text: "Comment Anouilh modernise-t-il le mythe antique ?",
+                extrait: "CRÉON : Tu es folle, ma petite. Tu es folle.",
+                choices: [
+                    { text: "En utilisant un langage familier et contemporain", correct: true, explanation: "Exact ! 'ma petite' contraste avec le sujet tragique." },
+                    { text: "En changeant complètement l'histoire", correct: false, explanation: "L'histoire reste fidèle au mythe." },
+                    { text: "En ajoutant des personnages comiques", correct: false, explanation: "Non, la tonalité reste tragique." },
+                    { text: "En supprimant la mort d'Antigone", correct: false, explanation: "Non, la fin tragique est conservée." }
+                ]
+            },
+            {
+                text: "Quelle est la fonction des didascalies ?",
+                extrait: "(Un décor neutre. Trois portes. Antigone entre.)",
+                choices: [
+                    { text: "Elles sont lues par le Prologue", correct: true, explanation: "Exact ! Le Prologue lit les didascalies." },
+                    { text: "Elles sont pour le metteur en scène seulement", correct: false, explanation: "Dans le texte, elles sont lues au public." },
+                    { text: "Il n'y a pas de didascalies", correct: false, explanation: "Si, la pièce en contient." },
+                    { text: "Elles sont jouées par les acteurs", correct: false, explanation: "Non, ce sont des indications." }
+                ]
+            },
+            {
+                text: "Pourquoi Antigone est-elle qualifiée de 'tragédie moderne' ?",
+                extrait: "ANTIGONE : Moi, je veux tout, tout de suite.",
+                choices: [
+                    { text: "Parce que les personnages parlent comme des gens ordinaires", correct: true, explanation: "Exact ! Langage quotidien + tragique = modernité." },
+                    { text: "Parce qu'elle se passe à l'époque moderne", correct: false, explanation: "L'action reste à Thèbes." },
+                    { text: "Parce qu'elle a une fin heureuse", correct: false, explanation: "Non, c'est une tragédie." },
+                    { text: "Parce qu'elle critique la société moderne", correct: false, explanation: "C'est sur la liberté individuelle." }
+                ]
+            }
+        ];
+        
+        // QUESTIONS DERNIER JOUR
+        const dernierjourQuestions = [
+            {
+                text: "Quel type de narrateur trouve-t-on dans ce roman ?",
+                extrait: "Condamné à mort ! Voilà cinq semaines que j'habite avec cette pensée.",
+                choices: [
+                    { text: "Narrateur extérieur", correct: false, explanation: "Non, le narrateur est dans l'histoire." },
+                    { text: "Narrateur autodiégétique (le héros)", correct: true, explanation: "Exact ! Le condamné raconte sa propre histoire." },
+                    { text: "Narrateur témoin", correct: false, explanation: "Non, il est le personnage principal." },
+                    { text: "Narrateur omniscient", correct: false, explanation: "Non, on ne sait que ce qu'il sait." }
+                ]
+            },
+            {
+                text: "Comment Hugo crée-t-il l'urgence temporelle ?",
+                extrait: "Encore vingt-quatre heures, puis douze, puis six. Le temps file.",
+                choices: [
+                    { text: "Par des analepses", correct: false, explanation: "Les retours en arrière ne créent pas l'urgence." },
+                    { text: "Par des ellipses", correct: true, explanation: "Exact ! Les ellipses montrent le temps qui s'échappe." },
+                    { text: "Par des pauses descriptives", correct: false, explanation: "Les pauses ralentissent le récit." },
+                    { text: "Par des prolepses", correct: false, explanation: "Les anticipations ne créent pas l'urgence." }
+                ]
+            },
+            {
+                text: "Quelle est la particularité de l'espace dans ce récit ?",
+                extrait: "J'écris ici, dans ma cellule.",
+                choices: [
+                    { text: "Espace narré et narrant confondus", correct: true, explanation: "Exact ! La cellule est le lieu de l'histoire ET de l'écriture." },
+                    { text: "Il n'y a qu'un seul espace", correct: false, explanation: "Non, c'est plus complexe." },
+                    { text: "L'espace change constamment", correct: false, explanation: "Non, il reste dans sa cellule." },
+                    { text: "L'espace est symbolique", correct: false, explanation: "Il est surtout fonctionnel." }
+                ]
+            },
+            {
+                text: "Quel est l'effet du journal intime ?",
+                extrait: "Je vais écrire tout ce que j'éprouve.",
+                choices: [
+                    { text: "Créer une distance", correct: false, explanation: "Non, c'est l'inverse." },
+                    { text: "Donner une impression d'authenticité", correct: true, explanation: "Exact ! On lit les pensées en direct." },
+                    { text: "Ralentir le rythme", correct: false, explanation: "Ce n'est pas son but." },
+                    { text: "Permettre des retours en arrière", correct: false, explanation: "Possible mais pas sa fonction première." }
+                ]
+            },
+            {
+                text: "Comment Hugo dénonce-t-il la peine de mort ?",
+                extrait: "Et dire que je suis là, vivant, que je sens, que je pense.",
+                choices: [
+                    { text: "En montrant l'humanité du condamné", correct: true, explanation: "Exact ! En donnant la parole au condamné, il le rend humain." },
+                    { text: "Par des arguments politiques", correct: false, explanation: "Il préfère l'émotion." },
+                    { text: "En décrivant l'injustice du procès", correct: false, explanation: "Le procès est à peine évoqué." },
+                    { text: "Par des statistiques", correct: false, explanation: "Non, c'est un récit." }
+                ]
+            },
+            {
+                text: "Quelle est la fonction des souvenirs ?",
+                extrait: "Je me souviens de ma mère, de ma femme, de mon enfant.",
+                choices: [
+                    { text: "Créer un contraste passé/présent", correct: true, explanation: "Exact ! Les souvenirs heureux rendent le présent plus tragique." },
+                    { text: "Ralentir l'action", correct: false, explanation: "C'est un effet secondaire." },
+                    { text: "Expliquer le crime", correct: false, explanation: "On ne sait pas quel est son crime." },
+                    { text: "Remplir les pages", correct: false, explanation: "Non, c'est un choix narratif." }
+                ]
+            }
+        ];
+        
+        // QUESTIONS BOÎTE À MERVEILLES
+        const boiteQuestions = [
+            {
+                text: "Qui est le narrateur ?",
+                extrait: "Je me souviens de notre maison.",
+                choices: [
+                    { text: "L'enfant", correct: false, explanation: "Non, l'enfant vit l'histoire." },
+                    { text: "L'adulte qui se souvient", correct: true, explanation: "Exact ! Le narrateur adulte raconte ses souvenirs." },
+                    { text: "Sefrioui", correct: false, explanation: "C'est un roman auto., pas une autobiographie." },
+                    { text: "Narrateur extérieur", correct: false, explanation: "Non, le 'je' indique un narrateur intérieur." }
+                ]
+            },
+            {
+                text: "Qu'est-ce que le discours indirect libre ?",
+                extrait: "Comme la rue était belle ! Ah ! si seulement je pouvais sortir !",
+                choices: [
+                    { text: "L'adulte qui décrit", correct: false, explanation: "Non, ce sont les pensées de l'enfant." },
+                    { text: "Les pensées de l'enfant sans guillemets", correct: true, explanation: "Exact ! La voix de l'enfant s'exprime dans le récit." },
+                    { text: "Un dialogue rapporté", correct: false, explanation: "Il n'y a pas de dialogue." },
+                    { text: "Une description objective", correct: false, explanation: "C'est très subjectif." }
+                ]
+            },
+            {
+                text: "Comment distinguer espace narré et espace narrant ?",
+                extrait: "Aujourd'hui, en écrivant, je retrouve les odeurs.",
+                choices: [
+                    { text: "Narré = enfance / Narrant = adulte qui écrit", correct: true, explanation: "Exact ! Deux temporalités distinctes." },
+                    { text: "Ils sont confondus", correct: false, explanation: "Non, il y a une distance temporelle." },
+                    { text: "Il n'y a qu'un seul espace", correct: false, explanation: "Non, il y a deux espaces." },
+                    { text: "Le narrant n'existe pas", correct: false, explanation: "Si, 'aujourd'hui' le montre." }
+                ]
+            },
+            {
+                text: "Quelle est la fonction de la boîte ?",
+                extrait: "Ma boîte contenait un bouton de verre, un clou tordu.",
+                choices: [
+                    { text: "Un simple jeu", correct: false, explanation: "Non, c'est plus que ça." },
+                    { text: "Symbole de l'imagination et du souvenir", correct: true, explanation: "Exact ! La boîte représente la mémoire." },
+                    { text: "Un objet magique", correct: false, explanation: "C'est réaliste, pas fantastique." },
+                    { text: "Un coffre au trésor", correct: false, explanation: "Au sens figuré, oui." }
+                ]
+            },
+            {
+                text: "Comment Sefrioui représente-t-il la médina ?",
+                extrait: "Les ruelles étroites, les odeurs d'épices.",
+                choices: [
+                    { text: "Descriptions sensorielles", correct: true, explanation: "Exact ! Il utilise tous les sens." },
+                    { text: "Plans architecturaux", correct: false, explanation: "Non, c'est littéraire." },
+                    { text: "Par des dialogues", correct: false, explanation: "L'espace est décrit, pas dialogué." },
+                    { text: "Par des métaphores compliquées", correct: false, explanation: "Le style est simple et évocateur." }
+                ]
+            },
+            {
+                text: "Quel est le rôle de la solitude ?",
+                extrait: "À six ans j'étais seul, peut-être malheureux.",
+                choices: [
+                    { text: "Permettre l'introspection", correct: true, explanation: "Exact ! La solitude développe la vie intérieure." },
+                    { text: "Elle est purement négative", correct: false, explanation: "L'enfant lui-même ne sait pas." },
+                    { text: "Compensée par la boîte", correct: false, explanation: "La boîte est liée à l'imagination." },
+                    { text: "Elle disparaît à la fin", correct: false, explanation: "Non, elle reste." }
+                ]
+            }
+        ];
+        
+        // MISE À JOUR DE L'INTERFACE
+        function updateUI() {
+            const antigoneCount = gameState.antigone.filter(v => v).length;
+            const dernierCount = gameState.dernierjour.filter(v => v).length;
+            const boiteCount = gameState.boite.filter(v => v).length;
+            
+            document.getElementById('antigone-count').textContent = antigoneCount + '/6';
+            document.getElementById('dernier-count').textContent = dernierCount + '/6';
+            document.getElementById('boite-count').textContent = boiteCount + '/6';
+            
+            document.getElementById('antigone-progress').textContent = `🏛️ ANTIGONE (${antigoneCount}/6)`;
+            document.getElementById('dernier-progress').textContent = `⛓️ DERNIER JOUR (${dernierCount}/6)`;
+            document.getElementById('boite-progress').textContent = `🕌 BOÎTE (${boiteCount}/6)`;
+            
+            document.getElementById('antigone-icon').className = 'slot-icon' + (antigoneCount === 6 ? ' completed' : '');
+            document.getElementById('dernier-icon').className = 'slot-icon' + (dernierCount === 6 ? ' completed' : '');
+            document.getElementById('boite-icon').className = 'slot-icon' + (boiteCount === 6 ? ' completed' : '');
+            
+            const totalProgress = ((antigoneCount + dernierCount + boiteCount) / 18) * 100;
+            document.getElementById('progress-fill').style.width = totalProgress + '%';
+        }
+        
+        // OUVERTURE MODALE
+        function openQuestion(oeuvre, index) {
+            let question;
+            if (oeuvre === 'antigone') question = antigoneQuestions[index];
+            else if (oeuvre === 'dernierjour') question = dernierjourQuestions[index];
+            else question = boiteQuestions[index];
+            
+            gameState.currentQuestion = { oeuvre, index, ...question };
+            gameState.modalOpen = true;
+            
+            const modal = document.getElementById('question-modal');
+            const content = document.getElementById('modal-content');
+            
+            let html = `
+                <div class="modal-question">
+                    <div class="extrait-texte">${question.extrait}</div>
+                    <div style="margin-top: 20px;">❓ ${question.text}</div>
+                </div>
+                <div class="modal-choices">
+            `;
+            
+            question.choices.forEach((choice, i) => {
+                html += `<div class="modal-choice" onclick="checkAnswer(${i})">${choice.text}</div>`;
+            });
+            
+            html += `</div><div class="modal-close" onclick="closeModal()">🔙 FERMER</div>`;
+            
+            content.innerHTML = html;
+            modal.classList.remove('hidden');
+        }
+        
+        // VÉRIFICATION RÉPONSE
+        function checkAnswer(choiceIndex) {
+            const q = gameState.currentQuestion;
+            const choice = q.choices[choiceIndex];
+            const modalChoices = document.querySelector('.modal-choices');
+            
+            if (choice.correct) {
+                gameState[q.oeuvre][q.index] = true;
+                
+                let html = '';
+                q.choices.forEach((c, i) => {
+                    html += `<div class="modal-choice ${c.correct ? 'correct' : 'incorrect'}">${c.text}</div>`;
+                });
+                
+                html += `<div class="feedback-good">✅ BRAVO ! ${choice.explanation}</div>`;
+                html += `<div class="modal-close" onclick="closeModal()">🔙 FERMER</div>`;
+                
+                modalChoices.innerHTML = html;
+                updateUI();
+                
+                if (gameState[q.oeuvre].filter(v => v).length === 6) {
+                    setTimeout(() => {
+                        alert('🎉 FÉLICITATIONS ! Vous avez complété toutes les questions !');
+                    }, 500);
+                }
+            } else {
+                let html = '';
+                q.choices.forEach((c, i) => {
+                    html += `<div class="modal-choice ${i === choiceIndex ? 'incorrect' : ''}">${c.text}</div>`;
+                });
+                
+                html += `<div class="feedback-bad">❌ MAUVAISE RÉPONSE. ${choice.explanation}</div>`;
+                html += `<div class="modal-close" onclick="closeModal()">🔙 FERMER</div>`;
+                
+                modalChoices.innerHTML = html;
+            }
+        }
+        
+        // FERMETURE MODALE
+        function closeModal() {
+            document.getElementById('question-modal').classList.add('hidden');
+            gameState.modalOpen = false;
+            renderScene();
+        }
+        
+        // RENDU SCÈNES
+        function renderScene() {
+            const container = document.getElementById('scene-container');
+            let html = '';
+            
+            if (gameState.currentScene === 'accueil') {
+                html = `
+                    <div class="pixel-scene">
+                        <div style="text-align: center; margin-bottom: 30px; font-size: 3em;">🔍</div>
+                        <div class="extrait-card">
+                            "Trois œuvres majeures de la littérature ont perdu leur mémoire. 
+                            Leurs secrets narratologiques sont éparpillés. Résolvez 6 énigmes par œuvre."
+                        </div>
+                        <div style="color: #ffd700; text-align: center; margin: 30px 0;">
+                            🏛️ ANTIGONE (6 questions)<br>
+                            ⛓️ DERNIER JOUR (6 questions)<br>
+                            🕌 BOÎTE À MERVEILLES (6 questions)
+                        </div>
+                        <button class="pixel-btn" onclick="goToScene('carte')">🗺️ COMMENCER</button>
+                    </div>
+                `;
+            }
+            else if (gameState.currentScene === 'carte') {
+                const antigoneCount = gameState.antigone.filter(v => v).length;
+                const dernierCount = gameState.dernierjour.filter(v => v).length;
+                const boiteCount = gameState.boite.filter(v => v).length;
+                
+                html = `
+                    <div class="pixel-scene">
+                        <div class="location-header">🗺️ CARTE DES LIEUX</div>
+                        <div class="map-grid">
+                            <div class="map-tile ${antigoneCount === 6 ? 'completed' : ''}" onclick="goToScene('antigone')">
+                                <div class="tile-icon">🏛️</div>
+                                <div>ANTIGONE</div>
+                                <div class="tile-progress">${antigoneCount}/6</div>
+                            </div>
+                            <div class="map-tile ${dernierCount === 6 ? 'completed' : ''}" onclick="goToScene('dernierjour')">
+                                <div class="tile-icon">⛓️</div>
+                                <div>DERNIER JOUR</div>
+                                <div class="tile-progress">${dernierCount}/6</div>
+                            </div>
+                            <div class="map-tile ${boiteCount === 6 ? 'completed' : ''}" onclick="goToScene('boite')">
+                                <div class="tile-icon">🕌</div>
+                                <div>BOÎTE À MERVEILLES</div>
+                                <div class="tile-progress">${boiteCount}/6</div>
+                            </div>
+                            <div class="map-tile ${(antigoneCount === 6 && dernierCount === 6 && boiteCount === 6) ? 'completed' : 'locked'}" 
+                                 onclick="${(antigoneCount === 6 && dernierCount === 6 && boiteCount === 6) ? 'goToScene(\'final\')' : ''}">
+                                <div class="tile-icon">📋</div>
+                                <div>RAPPORT FINAL</div>
+                            </div>
+                        </div>
+                        <button class="pixel-btn" onclick="goToScene('accueil')">🔙 RETOUR</button>
+                    </div>
+                `;
+            }
+            else if (gameState.currentScene === 'antigone') {
+                let questionsHtml = '';
+                gameState.antigone.forEach((completed, index) => {
+                    questionsHtml += `
+                        <div class="question-card ${completed ? 'completed' : ''}" 
+                             onclick="${!completed ? `openQuestion('antigone', ${index})` : ''}">
+                            <div class="question-number">Q${index + 1}</div>
+                            <div>${antigoneQuestions[index].text.substring(0, 50)}...</div>
+                            <div class="question-status">${completed ? '✅' : '❌'}</div>
+                        </div>
+                    `;
+                });
+                
+                html = `
+                    <div class="pixel-scene">
+                        <div class="location-header">🏛️ ANTIGONE - Jean Anouilh</div>
+                        <div class="character-container">
+                            <div class="pixel-character character-antigone">
+                                <span class="character-emoji">👤</span>
+                                <span class="character-name">ANTIGONE</span>
+                            </div>
+                        </div>
+                        <div class="extrait-card">
+                            <div class="extrait-texte">"Je dirai oui à la mort, plutôt que de dire non à ce que je dois faire."</div>
+                        </div>
+                        <div class="questions-grid">${questionsHtml}</div>
+                        <button class="pixel-btn" onclick="goToScene('carte')">🗺️ RETOUR</button>
+                    </div>
+                `;
+            }
+            else if (gameState.currentScene === 'dernierjour') {
+                let questionsHtml = '';
+                gameState.dernierjour.forEach((completed, index) => {
+                    questionsHtml += `
+                        <div class="question-card ${completed ? 'completed' : ''}" 
+                             onclick="${!completed ? `openQuestion('dernierjour', ${index})` : ''}">
+                            <div class="question-number">Q${index + 1}</div>
+                            <div>${dernierjourQuestions[index].text.substring(0, 50)}...</div>
+                            <div class="question-status">${completed ? '✅' : '❌'}</div>
+                        </div>
+                    `;
+                });
+                
+                html = `
+                    <div class="pixel-scene">
+                        <div class="location-header">⛓️ LE DERNIER JOUR - Victor Hugo</div>
+                        <div class="character-container">
+                            <div class="pixel-character character-condamne">
+                                <span class="character-emoji">⛓️</span>
+                                <span class="character-name">CONDAMNÉ</span>
+                            </div>
+                        </div>
+                        <div class="extrait-card">
+                            <div class="extrait-texte">"Condamné à mort ! Voilà cinq semaines que j'habite avec cette pensée..."</div>
+                        </div>
+                        <div class="questions-grid">${questionsHtml}</div>
+                        <button class="pixel-btn" onclick="goToScene('carte')">🗺️ RETOUR</button>
+                    </div>
+                `;
+            }
+            else if (gameState.currentScene === 'boite') {
+                let questionsHtml = '';
+                gameState.boite.forEach((completed, index) => {
+                    questionsHtml += `
+                        <div class="question-card ${completed ? 'completed' : ''}" 
+                             onclick="${!completed ? `openQuestion('boite', ${index})` : ''}">
+                            <div class="question-number">Q${index + 1}</div>
+                            <div>${boiteQuestions[index].text.substring(0, 50)}...</div>
+                            <div class="question-status">${completed ? '✅' : '❌'}</div>
+                        </div>
+                    `;
+                });
+                
+                html = `
+                    <div class="pixel-scene">
+                        <div class="location-header">🕌 LA BOÎTE À MERVEILLES - Sefrioui</div>
+                        <div class="character-container">
+                            <div class="pixel-character character-enfant">
+                                <span class="character-emoji">👦</span>
+                                <span class="character-name">SIDI MOHAMMED</span>
+                            </div>
+                        </div>
+                        <div class="extrait-card">
+                            <div class="extrait-texte">"Je me souviens de notre maison. C'était une maison traditionnelle..."</div>
+                        </div>
+                        <div class="questions-grid">${questionsHtml}</div>
+                        <button class="pixel-btn" onclick="goToScene('carte')">🗺️ RETOUR</button>
+                    </div>
+                `;
+            }
+            else if (gameState.currentScene === 'final') {
+                const antigoneCount = gameState.antigone.filter(v => v).length;
+                const dernierCount = gameState.dernierjour.filter(v => v).length;
+                const boiteCount = gameState.boite.filter(v => v).length;
+                const total = antigoneCount + dernierCount + boiteCount;
+                
+                html = `
+                    <div class="pixel-scene pixel-diploma">
+                        <div style="font-size: 3em;">🏆</div>
+                        <h2 style="margin: 20px 0;">ENQUÊTE RÉSOLUE</h2>
+                        <div class="diploma-stats">
+                            <strong>RAPPORT DE SYNTHÈSE</strong><br><br>
+                            🏛️ ANTIGONE: ${antigoneCount}/6<br>
+                            ⛓️ DERNIER JOUR: ${dernierCount}/6<br>
+                            🕌 BOÎTE À MERVEILLES: ${boiteCount}/6<br>
+                            <br>SCORE TOTAL: ${total}/18
+                        </div>
+                        <button class="pixel-btn" onclick="resetGame()">🔄 RECOMMENCER</button>
+                    </div>
+                `;
+            }
+            
+            container.innerHTML = html;
+            updateUI();
+        }
+        
+        // NAVIGATION
+        function goToScene(scene) {
+            gameState.currentScene = scene;
+            renderScene();
+        }
+        
+        // RESET
+        function resetGame() {
+            gameState = {
+                currentScene: 'accueil',
+                currentQuestion: null,
+                modalOpen: false,
+                antigone: [false, false, false, false, false, false],
+                dernierjour: [false, false, false, false, false, false],
+                boite: [false, false, false, false, false, false]
+            };
+            renderScene();
+        }
+        
+        // INIT
+        renderScene();
+    </script>
+</body>
+</html>
